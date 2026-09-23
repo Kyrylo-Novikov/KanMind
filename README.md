@@ -38,7 +38,7 @@ kanmind/
 ## 1. Repository klonen
 
 ```
-git clone [https://github.com/DEIN-GITHUB-BENUTZERNAME/kanmind.git](https://github.com/DEIN-GITHUB-BENUTZERNAME/kanmind.git)
+git clone  [https://github.com/Kyrylo-Novikov/KanMind.git](https://github.com/Kyrylo-Novikov/kanmind.git)
 cd kanmind
 ```
 
