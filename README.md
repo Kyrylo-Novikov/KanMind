@@ -11,14 +11,14 @@ KanMind ist eine interaktive Web-Anwendung zur Aufgabenverwaltung im Kanban-Stil
 ## 🛠️ Technologien
 
 - **Backend:** Python, Django, Django REST Framework, SQLite/PostgreSQL
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript (ohne Frameworks)
-- **Tools & API:** REST API, Token-based Authentication, Git, VS Code Live Server
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript 
+- **Tools & API:** REST API, Token-based Authentication
 
 ---
 
 ## ✨ Features
 
-- **Task-Management:** Erstellen, Bearbeiten, Löschen und Verschieben von Aufgaben über verschiedene Status-Spalten (z. B. To-Do, In Progress, Awaiting Feedback, Done).
+- **Task-Management:** Erstellen, Bearbeiten, Löschen und Verschieben von Aufgaben über verschiedene Status-Spalten (z. B. To-Do, In Progress, Review, Done).
 - **Benutzerverwaltung:** Registrierung, Login und Authentifizierung von Benutzern.
 - **RESTful API:** Saubere Schnittstelle zwischen Frontend und Backend für Daten-Endpoints (Tasks, User, Kontakte).
 
