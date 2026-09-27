@@ -1,8 +1,9 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, views
 from .serializers import RegistrationSerializer
 from user_auth.models import UserProfile
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -42,3 +43,12 @@ class LoginView(ObtainAuthToken):
             return Response(data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(views.APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response({"detail": "Erfogreich ausgeloggt"}, status=status.HTTP_200_OK)
