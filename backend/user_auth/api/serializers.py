@@ -1,19 +1,22 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
 from user_auth.models import UserProfile
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    fullname = serializers.CharField(source='username')
-    repeated_password = serializers.CharField(write_only=True)
+    fullname = serializers.CharField(min_length=3,
+                                     source='username', validators=[UniqueValidator(queryset=User.objects.all(), message="User with this name already exists.")])
+    email = serializers.EmailField(required=True, validators=[UniqueValidator(
+        queryset=User.objects.all(), message="User with this email already exists.")])
+    password = serializers.CharField(write_only=True, min_length=8)
+    repeated_password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
         fields = ['fullname', 'email', 'password',
                   'repeated_password',
                   ]
-        extra_kwargs = {'password': {'write_only': True},
-                        'email': {'required': True}}
 
     def validate_email(self, value):
         if User.objects.filter(email__iexact=value).exists():
