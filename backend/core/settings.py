@@ -46,9 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'user_auth',
+    'auth_app',
     'corsheaders',
-    'boards',
+    'board_app',
     'drf_spectacular',
 ]
 
@@ -76,7 +76,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'kanmind_backend.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -93,7 +93,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'kanmind_backend.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
