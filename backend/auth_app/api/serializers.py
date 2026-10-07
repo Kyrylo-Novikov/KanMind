@@ -2,20 +2,22 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
 from auth_app.models import UserProfile
+from rest_framework.authtoken.models import Token
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     fullname = serializers.CharField(min_length=3,
                                      source='username', validators=[UniqueValidator(queryset=User.objects.all(), message="User with this name already exists.")])
-    email = serializers.EmailField(required=True, validators=[UniqueValidator(
-        queryset=User.objects.all(), message="User with this email already exists.")])
+    email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, min_length=8)
     repeated_password = serializers.CharField(write_only=True, min_length=8)
+    token = serializers.CharField(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(source='id', read_only=True)
 
     class Meta:
         model = User
-        fields = ['fullname', 'email', 'password',
-                  'repeated_password',
+        fields = ['token', 'fullname', 'email', 'password',
+                  'repeated_password', 'user_id'
                   ]
 
     def validate_email(self, value):
@@ -35,9 +37,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
         validated_data.pop('repeated_password')
 
         user = User.objects.create_user(
-            **validated_data)
-        UserProfile.objects.create(
-            user=user,
-        )
-
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password'])
+        UserProfile.objects.create(user=user)
+        token = Token.objects.create(user=user)
+        user.token = token.key
         return user
