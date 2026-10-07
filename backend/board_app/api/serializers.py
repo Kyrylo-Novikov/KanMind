@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from board_app.models import Board, Task, Comment
 
 
-class MemberUserSerializer(serializers.ModelSerializer):
+class MemberSerializer(serializers.ModelSerializer):
     fullname = serializers.CharField(source='username', read_only=True)
 
     class Meta:
@@ -13,8 +13,8 @@ class MemberUserSerializer(serializers.ModelSerializer):
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
-    assignee = MemberUserSerializer()
-    reviewer = MemberUserSerializer()
+    assignee = MemberSerializer()
+    reviewer = MemberSerializer()
     priority = serializers.CharField(source='prio')
     comments_count = serializers.SerializerMethodField()
 
@@ -25,7 +25,8 @@ class TaskReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'title', 'due_date', 'reviewer', 'board',
+                  'assignee', 'priority', 'status', 'description', 'comments_count']
 
 
 class TaskCreatUpdateSerializer(serializers.ModelSerializer):
@@ -37,18 +38,16 @@ class TaskCreatUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'title', 'due_date', 'reviewer_id', 'board',
+                  'assignee_id', 'priority', 'status', 'description']
         read_only_fields = ['id']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         if instance.assignee:
-            rep['assignee'] = MemberUserSerializer(instance.assignee).data
+            rep['assignee'] = MemberSerializer(instance.assignee).data
         if instance.reviewer:
-            rep['reviewer'] = MemberUserSerializer(instance.reviewer).data
-
-        print("--- DEBUG TASK REPRESENTATION ---")
-        print(rep)
+            rep['reviewer'] = MemberSerializer(instance.reviewer).data
         return rep
 
 
@@ -80,11 +79,12 @@ class BoardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
-        fields = '__all__'
+        fields = ['id', 'tasks', 'members', 'member_count', 'ticket_count',
+                  'tasks_to_do_count', 'tasks_high_prio_count', 'title']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['members'] = MemberUserSerializer(
+        rep['members'] = MemberSerializer(
             instance.members.all(), many=True).data
 
         return rep
