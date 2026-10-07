@@ -7,6 +7,9 @@ class Board(models.Model):
     title = models.CharField(max_length=50, validators=[MinLengthValidator(3)])
     members = models.ManyToManyField(User, related_name='boards', blank=True)
 
+    def __str__(self):
+        return f"{self.title}"
+
 
 class Task(models.Model):
 
@@ -30,12 +33,15 @@ class Task(models.Model):
     prio = models.CharField(max_length=20, choices=Priority, default='medium')
 
     assignee = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name='task_assignees', blank=True, null=True)
+        User, on_delete=models.SET_NULL, related_name='assigned_tasks', blank=True, null=True)
     board = models.ForeignKey(
         'Board', on_delete=models.CASCADE, related_name='tasks')
     reviewer = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name='task_reviewers', blank=True, null=True)
+        User, on_delete=models.SET_NULL, related_name='reviewed_tasks', blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.title}"
 
 
 class Comment(models.Model):
