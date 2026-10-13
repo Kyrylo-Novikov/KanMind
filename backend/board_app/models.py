@@ -24,15 +24,14 @@ class Task(models.Model):
         IN_PROGRESS = 'in-progress', 'In Progress'
         REVIEW = 'review', 'Review'
         DONE = 'done', 'Done'
-
-    status = models.CharField(max_length=20, choices=Status, default='to-do')
+    status = models.CharField(max_length=20, choices=Status)
 
     class Priority(models.TextChoices):
         LOW = 'low', 'Low'
         MEDIUM = 'medium', 'Medium'
         HIGH = 'high', 'High'
-
-    prio = models.CharField(max_length=20, choices=Priority, default='medium')
+    priority = models.CharField(
+        max_length=20, choices=Priority)
 
     assignee = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name='assigned_tasks', blank=True, null=True)
