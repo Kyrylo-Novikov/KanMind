@@ -27,7 +27,7 @@ class LoginView(ObtainAuthToken):
                 user_obj = User.objects.get(email=email)
                 data['username'] = user_obj.username
             except User.DoesNotExist:
-                pass
+                return Response("User dont exist", status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(data=data)
 
