@@ -5,7 +5,9 @@ from django.core.validators import MinLengthValidator
 
 class Board(models.Model):
     title = models.CharField(max_length=50, validators=[MinLengthValidator(3)])
-    members = models.ManyToManyField(User, related_name='boards', blank=True)
+    members = models.ManyToManyField(User, related_name='board', blank=True)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='owner_board')
 
     def __str__(self):
         return f"{self.title}"
