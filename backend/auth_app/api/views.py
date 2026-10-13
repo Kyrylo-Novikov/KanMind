@@ -32,14 +32,13 @@ class LoginView(ObtainAuthToken):
         serializer = self.serializer_class(data=data)
 
         if serializer.is_valid():
-            print(type(Token), Token.__module__)
             user = serializer.validated_data['user']
             token, create_bool = Token.objects.get_or_create(user=user)
             data = {'token': token.key,
                     'fullname': user.username,
-                    'email': user.email
+                    'email': user.email,
+                    'user_id': user.id
                     }
-            print(type(Token), Token.__module__)
             return Response(data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
