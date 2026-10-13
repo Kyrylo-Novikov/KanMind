@@ -8,8 +8,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'fullname', 'email', 'last_login',
-                  'date_joined', 'user_permissions']
+        fields = ['id', 'fullname', 'email']
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
