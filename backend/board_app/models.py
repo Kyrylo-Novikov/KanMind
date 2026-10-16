@@ -14,7 +14,8 @@ class Board(models.Model):
 
 
 class Task(models.Model):
-
+    author = models.ForeignKey(
+        User, related_name='task_author', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, validators=[MinLengthValidator(3)])
     description = models.CharField(
         max_length=350, validators=[MinLengthValidator(3)])
