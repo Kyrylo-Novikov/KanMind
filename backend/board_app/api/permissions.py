@@ -9,8 +9,11 @@ class IsOwner(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        is_owner = request.user == obj.owner
-        return is_owner
+        if hasattr(obj, 'owner'):
+            return obj.owner == request.user
+        if hasattr(obj, 'board'):
+            return obj.board.owner == request.user
+        return False
 
 
 class IsMember(permissions.BasePermission):
@@ -20,8 +23,11 @@ class IsMember(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        is_member = obj.members.filter(id=request.user.id).exists()
-        return is_member
+        if hasattr(obj, 'board'):
+            return obj.board.members.filter(id=request.user.id).exists()
+        if hasattr(obj, 'members'):
+            return obj.members.filter(id=request.user.id).exists()
+        return False
 
 
 class IsMemberOrOwnerOfTheBoard(permissions.BasePermission):
@@ -51,5 +57,4 @@ class IsAuthor(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        is_author = request.user == obj.author
-        return is_author
+        return obj.author == request.user
