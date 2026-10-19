@@ -56,23 +56,33 @@ class EmailCheckView(APIView):
 
 
 class TaskCreateView(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Task.objects.filter(board__members=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
-            return TaskReadSerializer
-        return TaskCreatUpdateSerializer
+            return TaskReadCreateSerializer
+        return TaskUpdateDeleteSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class TaskUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Task.objects.all()
-    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Task.objects.filter(board__members=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
-            return TaskReadSerializer
-        return TaskCreatUpdateSerializer
+            return TaskReadCreateSerializer
+        return TaskUpdateDeleteSerializer
+
+    def get_permissions(self):
+        if self.request.method == "DELETE":
+            return [IsAuthenticated(), (IsAuthor | IsOwner)()]
+        return [IsAuthenticated(), IsMember()]
 
 
 class CommentListView(generics.ListCreateAPIView):
