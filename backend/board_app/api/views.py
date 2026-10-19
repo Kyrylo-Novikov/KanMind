@@ -87,17 +87,22 @@ class TaskUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
 class CommentListView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsMember]
+
+    def get_task(self):
+        """
+        Retrieves the task from the URL and verifies that the current user is a member of the board.
+        """
+        task_id = self.kwargs.get('pk')
+        return get_object_or_404(Task, id=task_id, board__members=self.request.user)
 
     def get_queryset(self):
-        task_id = self.kwargs.get('pk')
-        return Comment.objects.filter(task_id=task_id)
+        task = self.get_task()
+        return Comment.objects.filter(task=task)
 
     def perform_create(self, serializer):
-        task_id = self.kwargs.get('pk')
-        serializer.save(author=self.request.user, task_id=task_id)
-
-        # return super().post(request, *args, **kwargs)
+        task = self.get_task()
+        serializer.save(author=self.request.user, task=task)
 
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
