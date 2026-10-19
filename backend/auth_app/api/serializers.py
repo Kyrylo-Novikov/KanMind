@@ -1,8 +1,8 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.models import User
-from auth_app.models import UserProfile
 from rest_framework.authtoken.models import Token
+from auth_app.models import UserProfile
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

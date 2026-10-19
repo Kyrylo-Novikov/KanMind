@@ -1,5 +1,6 @@
-from rest_framework import serializers
+from datetime import date
 from django.contrib.auth.models import User
+from rest_framework import serializers
 from board_app.models import Board, Task, Comment
 
 

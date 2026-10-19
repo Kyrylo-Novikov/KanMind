@@ -1,12 +1,11 @@
-from rest_framework import generics, status, views
-from .serializers import RegistrationSerializer
-from auth_app.models import UserProfile
 from django.contrib.auth.models import User
+from rest_framework import generics, status, views
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from .serializers import RegistrationSerializer
 
 
 class RegistrationView(generics.CreateAPIView):

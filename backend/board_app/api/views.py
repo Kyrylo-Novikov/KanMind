@@ -1,15 +1,13 @@
-from rest_framework import generics, status
-from .serializers import BoardSerializer, MemberUserSerializer, TaskCreatUpdateSerializer, TaskReadSerializer, CommentSerializer
-from auth_app.models import UserProfile
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from board_app.models import Board, Task, Comment
 from rest_framework.views import APIView
-import logging
-
-logger = logging.getLogger(__name__)
+from board_app.models import Board, Task, Comment
+from .serializers import BoardSerializer, MemberSerializer, TaskUpdateDeleteSerializer, TaskReadCreateSerializer, CommentSerializer, BoardDetailSerializer
+from .permissions import IsOwner, IsMember, IsAuthor
 
 
 class BoardListView(generics.ListCreateAPIView):
