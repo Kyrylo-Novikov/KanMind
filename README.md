@@ -141,4 +141,4 @@ Developed as part of the advanced training program at Developer Akademie GmbH.
 - **Backend:** Independent development effort.
 - **Frontend & Assets:** Provided by Developer Akademie GmbH under the "Developer Akademie Learning License (Non-commercial)".
 
-For full license terms, please refer to the `LICENSE.md` file (if provided) or contact Developer Akademie.
+For full license terms, please refer to the `LICENSE.md` file included in this repository.
