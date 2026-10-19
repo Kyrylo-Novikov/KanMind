@@ -109,8 +109,7 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class AssignedToMeView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Task.objects.all()
-    serializer_class = TaskReadSerializer
+    serializer_class = TaskReadCreateSerializer
 
     def get_queryset(self):
         return Task.objects.filter(assignee=self.request.user)
@@ -118,8 +117,7 @@ class AssignedToMeView(generics.ListAPIView):
 
 class ReviewingView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = Task.objects.all()
-    serializer_class = TaskReadSerializer
+    serializer_class = TaskReadCreateSerializer
 
     def get_queryset(self):
         return Task.objects.filter(reviewer=self.request.user)
