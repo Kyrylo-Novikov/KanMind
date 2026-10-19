@@ -81,11 +81,25 @@ class BoardSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'member_count', 'ticket_count',
                   'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id', 'members']
 
+
+class BoardDetailSerializer(BoardSerializer):
+    class Meta(BoardSerializer.Meta):
+        fields = ['id', 'title',
+                  'owner_id', 'members']
+
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['members'] = MemberSerializer(
-            instance.members.all(), many=True).data
-
+        request = self.context.get('request')
+        if request.method == 'PATCH':
+            rep.pop('owner_id')
+            rep['owner_data'] = MemberSerializer(instance.owner).data
+            rep['members_data'] = MemberSerializer(
+                instance.members.all(), many=True).data
+        else:
+            rep['members'] = MemberSerializer(
+                instance.members.all(), many=True).data
+            rep['tasks'] = TaskReadCreateSerializer(
+                instance.tasks.all(), many=True).data
         return rep
 
 
