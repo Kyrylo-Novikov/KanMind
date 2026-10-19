@@ -15,14 +15,12 @@ class BoardListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        # Get all boards where the user is owner or member
         user = self.request.user
-        if user.is_authenticated:
-            return Board.objects.filter(members=user)
-        return Board.objects.none()
+        return Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
 
     def perform_create(self, serializer):
-        board = serializer.save()
-        board.members.add(self.request.user)
+        board = serializer.save(owner=self.request.user)
 
 
 class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
