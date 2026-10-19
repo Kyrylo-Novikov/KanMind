@@ -3,6 +3,23 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from board_app.models import Board, Task, Comment
 
+def validate_board_member(serializer, user):
+    """
+    Validate whether the user is a member of the board
+    """
+    if not user:
+        return user
+    board = None
+    if serializer.instance and hasattr(serializer.instance, 'board'):
+        board = serializer.instance.board
+    elif 'board' in serializer.initial_data:
+        board = Board.objects.filter(
+            id=serializer.initial_data.get('board')).first()
+    if board and not board.members.filter(id=user.id).exists():
+        raise serializers.ValidationError(
+            "Given User is not a  member of this board")
+    return user
+
 
 class MemberSerializer(serializers.ModelSerializer):
     fullname = serializers.CharField(source='username', read_only=True)
@@ -12,21 +29,26 @@ class MemberSerializer(serializers.ModelSerializer):
         fields = ['id', 'fullname', 'email']
 
 
-class TaskReadSerializer(serializers.ModelSerializer):
+class TaskReadCreateSerializer(serializers.ModelSerializer):
     assignee = MemberSerializer()
     reviewer = MemberSerializer()
-    priority = serializers.CharField(source='prio')
+    priority = serializers.CharField()
     comments_count = serializers.SerializerMethodField()
 
     def get_comments_count(self, obj) -> int:
         count = obj.comments.count()
-        print("Anzahl der Kommentare für den task", obj.id, count)
         return count
 
     class Meta:
         model = Task
-        fields = ['id', 'title', 'due_date', 'reviewer', 'board',
-                  'assignee', 'priority', 'status', 'description', 'comments_count']
+        fields = ['id', 'board', 'title', 'description', 'status', 'priority',
+                  'assignee', 'reviewer', 'due_date', 'comments_count']
+
+        def validate_assignee(self, value):
+            return validate_board_member(self, value)
+
+        def validate_reviewer(self, value):
+            return validate_board_member(self, value)
 
 
 class TaskCreatUpdateSerializer(serializers.ModelSerializer):
