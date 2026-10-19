@@ -16,30 +16,24 @@ class RegistrationView(generics.CreateAPIView):
 
 class LoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
+    """
+    Validates email and resolves user objects for Token authentification
+    """
 
     def post(self, request):
-
         data = request.data.copy()
-        email = data.get('email')
-        if email and not data.get('username'):
-            try:
-                user_obj = User.objects.get(email=email)
-                data['username'] = user_obj.username
-            except User.DoesNotExist:
-                return Response("User dont exist", status=status.HTTP_400_BAD_REQUEST)
-
+        if not (email := data.get('email')):
+            return Response({'email': ['This field is required']}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            data['username'] = User.objects.get(email__iexact=email).username
+        except User.DoesNotExist:
+            return Response("User dont exist", status=status.HTTP_400_BAD_REQUEST)
         serializer = self.serializer_class(data=data)
-
         if serializer.is_valid():
             user = serializer.validated_data['user']
             token, create_bool = Token.objects.get_or_create(user=user)
-            data = {'token': token.key,
-                    'fullname': user.username,
-                    'email': user.email,
-                    'user_id': user.id
-                    }
-            return Response(data, status=status.HTTP_200_OK)
-
+            return Response({'token': token.key, 'fullname': user.username,
+                             'email': user.email, 'user_id': user.id}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
