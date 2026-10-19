@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from board_app.models import Board, Task, Comment
 
+
 def validate_board_member(serializer, user):
     """
     Validate whether the user is a member of the board
@@ -51,25 +52,47 @@ class TaskReadCreateSerializer(serializers.ModelSerializer):
             return validate_board_member(self, value)
 
 
-class TaskCreatUpdateSerializer(serializers.ModelSerializer):
-    priority = serializers.CharField(source='prio', required=False)
-    assignee_id = serializers.PrimaryKeyRelatedField(source="assignee", allow_null=True,
-                                                     queryset=User.objects.all(), required=False)
-    reviewer_id = serializers.PrimaryKeyRelatedField(source="reviewer",
-                                                     queryset=User.objects.all(), required=False, allow_null=True)
+class TaskUpdateDeleteSerializer(serializers.ModelSerializer):
+    priority = serializers.CharField()
+    assignee_id = serializers.PrimaryKeyRelatedField(
+        source="assignee", allow_null=True, queryset=User.objects.all(), required=False, write_only=True)
+    reviewer_id = serializers.PrimaryKeyRelatedField(
+        source="reviewer", queryset=User.objects.all(), required=False, allow_null=True, write_only=True)
+    due_date = serializers.DateField(required=True)
+    comments_count = serializers.SerializerMethodField()
+
+    def get_comments_count(self, obj) -> int:
+        comments = obj.comments.count()
+        return comments
 
     class Meta:
         model = Task
-        fields = ['id', 'title', 'due_date', 'reviewer_id', 'board',
-                  'assignee_id', 'priority', 'status', 'description']
+        fields = ['id', 'board', 'title', 'description', 'status',
+                  'priority', 'reviewer_id', 'assignee_id', 'assignee', 'reviewer', 'due_date', 'comments_count']
         read_only_fields = ['id']
+
+    def validate_assignee_id(self, value):
+        return validate_board_member(self, value)
+
+    def validate_reviewer_id(self, value):
+        return validate_board_member(self, value)
+
+    def validate_due_date(self, value):
+        if value < date.today():
+            raise serializers.ValidationError(
+                "The due date hase to be in the future")
+        return value
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         if instance.assignee:
             rep['assignee'] = MemberSerializer(instance.assignee).data
+        else:
+            rep['assignee'] = None
         if instance.reviewer:
             rep['reviewer'] = MemberSerializer(instance.reviewer).data
+        else:
+            rep['reviewer'] = None
         return rep
 
 
@@ -130,5 +153,5 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'task', 'author', 'content', 'created_at']
-        read_only_fields = ['id', 'task', 'created_at']
+        fields = ['id', 'created_at', 'author', 'content']
+        read_only_fields = ['id', 'created_at']
