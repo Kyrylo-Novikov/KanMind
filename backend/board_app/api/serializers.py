@@ -52,18 +52,17 @@ class TaskCreatUpdateSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
-    tasks = TaskReadSerializer(many=True, read_only=True)
+    title = serializers.CharField(max_length=50)
     members = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=User.objects.all(),
-        required=False
+        required=False, write_only=True
     )
     member_count = serializers.SerializerMethodField()
     ticket_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
     tasks_high_prio_count = serializers.SerializerMethodField()
-
-    title = serializers.CharField(max_length=50)
+    owner_id = serializers.ReadOnlyField(source='owner.id')
 
     def get_member_count(self, obj) -> int:
         return obj.members.count()
@@ -75,12 +74,12 @@ class BoardSerializer(serializers.ModelSerializer):
         return obj.tasks.filter(status='to-do').count()
 
     def get_tasks_high_prio_count(self, obj) -> int:
-        return obj.tasks.filter(prio='high').count()
+        return obj.tasks.filter(priority='high').count()
 
     class Meta:
         model = Board
-        fields = ['id', 'tasks', 'members', 'member_count', 'ticket_count',
-                  'tasks_to_do_count', 'tasks_high_prio_count', 'title']
+        fields = ['id', 'title', 'member_count', 'ticket_count',
+                  'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id', 'members']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
