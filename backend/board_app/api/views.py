@@ -24,11 +24,17 @@ class BoardListView(generics.ListCreateAPIView):
 
 
 class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = BoardSerializer
-    permission_classes = [IsAuthenticated]
+    serializer_class = BoardDetailSerializer
 
     def get_queryset(self):
-        return Board.objects.filter(members=self.request.user)
+        # Get all boards where the user is owner or member
+        user = self.request.user
+        return Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
+
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            return [IsOwner(), IsAuthenticated()]
+        return [IsAuthenticated(), (IsMember | IsOwner)()]
 
 
 class EmailCheckView(APIView):
