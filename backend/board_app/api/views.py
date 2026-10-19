@@ -34,25 +34,20 @@ class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class EmailCheckView(APIView):
-    # permission_classes = [IsAuthenticated]
+    '''
+    Takes the query param to check if a user with this email is already exists.
+    '''
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         email = request.query_params.get('email')
 
         if not email:
             return Response(
-                {'detail': 'E-Mail-Parameter fehlt.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                {'detail': 'Email query parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(email=email)
-            serializer = MemberUserSerializer(user)
-        except User.DoesNotExist:
-            return Response({
-                "detail": "Nutzer nicht gefunden"
-            }, status=status.HTTP_404_NOT_FOUND)
-
+        user = get_object_or_404(User, email__iexact=email)
+        serializer = MemberSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
