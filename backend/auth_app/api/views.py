@@ -15,19 +15,41 @@ class RegistrationView(generics.CreateAPIView):
 
 
 class LoginView(ObtainAuthToken):
+    """
+    Validates email and resolves user objects for Token authentication
+    """
     permission_classes = [AllowAny]
-    """
-    Validates email and resolves user objects for Token authentification
-    """
 
-    def post(self, request):
-        data = request.data.copy()
+    def get_user_from_email(self, data):
+        """
+        Validates email and resolves user object.
+        Args:
+            data (dict): The request payload containing user credentials.
+        Returns:
+            tuple: (data, None) on success or (None, Response) on error.
+        """
+        data = data.copy()
         if not (email := data.get('email')):
-            return Response({'email': ['This field is required']}, status=status.HTTP_400_BAD_REQUEST)
+            return None, Response({'email': ['The field is required']}, status=status.HTTP_400_BAD_REQUEST)
         try:
             data['username'] = User.objects.get(email__iexact=email).username
+            return data, None
         except User.DoesNotExist:
-            return Response("User dont exist", status=status.HTTP_400_BAD_REQUEST)
+            return None, Response({'non_field_errors': [
+                'Unable to log in with provided credentials.']},
+                status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        """
+        Creates a token for the logged in user.
+        Args:
+            request(Request) : The HTTP request containing email and password values.
+        Returns:
+            Response: AJSON object with the user details and new token on seccess, or an error response if the email is missing/invalid or credentials are wrong
+        """
+        data, error_respons = self.get_user_from_email(request.data)
+        if error_respons:
+            return (error_respons)
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
