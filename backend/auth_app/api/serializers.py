@@ -6,7 +6,9 @@ from auth_app.models import UserProfile
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    # Expose username as fullname for the frontend
+    """
+    Serializer for user registration.
+    """
     fullname = serializers.CharField(min_length=3, required=True,
                                      source='username', validators=[UniqueValidator(queryset=User.objects.all(), message="User with this name already exists.")])
     email = serializers.EmailField(required=True)
@@ -23,26 +25,50 @@ class RegistrationSerializer(serializers.ModelSerializer):
                   'repeated_password', 'user_id'
                   ]
 
-    #   Validate the number of words in the fullname
-    #   It has to consist of at least 2 words.
     def validate_fullname(self, value):
-        striped_name = value.strip()
-        words = striped_name.split()
-        if len(words) >= 2:
-            return striped_name
-        else:
-            raise serializers.ValidationError(
-                'The name have to consist at least 2 words')
+        """
+        Validates the number of words in the fullname.
 
-    #   Validate the given email address.
-    #   It have to be a unregistered email address
+        Args:
+            value (str): The provided fullname string.
+        Raises:
+            serializers.ValidationError: If the name consists of less than 2 words.
+        Returns:
+            str: The stripped fullname.
+        """
+        stripped_name = value.strip()
+        words = stripped_name.split()
+        if len(words) >= 2:
+            return stripped_name
+        raise serializers.ValidationError(
+            'The name have to consist at least 2 words')
+
     def validate_email(self, value):
+        """
+        Validates that the provided email address is not already registered.
+
+        Args:
+            value (str): The provided email address.
+        Raises:
+            serializers.ValidationError: If the email address is already registered.
+        Returns:
+            str: The validated email address.
+        """
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError('Email already registered')
         return value
 
-    # Validate the matching of the both password inputs
     def validate(self, values):
+        """
+        Validates whether both password inputs match
+
+        Args:
+            values (dict): The provided password and repeated password.
+        Raises:
+            serializers.ValidationError: If the passwords dont match
+        Returns:
+            dict: The validated values dictionary.
+        """
         pw = values.get('password')
         repeated_pw = values.get('repeated_password')
         if pw != repeated_pw:
@@ -50,8 +76,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 {'error': ['passwords dont match']})
         return values
 
-    # Pop repeated_password out of the validated_data and then create the User object with token
     def create(self, validated_data):
+        """
+        Creates a user, a user profile and an authentication token.
+
+        Args:
+            validated_data (dict): The validated input data containing credentials.
+        Returns:
+            User: The newly created user
+        """
         validated_data.pop('repeated_password')
         user = User.objects.create_user(
             username=validated_data['username'],

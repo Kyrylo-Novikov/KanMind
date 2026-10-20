@@ -9,6 +9,9 @@ from .serializers import RegistrationSerializer
 
 
 class RegistrationView(generics.CreateAPIView):
+    """
+    API view for The registration
+    """
     queryset = User.objects.all()
     serializer_class = RegistrationSerializer
     permission_classes = [AllowAny]
@@ -60,9 +63,20 @@ class LoginView(ObtainAuthToken):
 
 
 class LogoutView(views.APIView):
+    """
+    API view for The logout
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """
+        Deletes the authentication token of the logged in user to log out.
+
+        Args:
+            request (Request): The HTTP request.
+        Returns:
+            Response: JSON object confirming the successful logout.
+        """
         request.user.auth_token.delete()
         return Response({"detail": "Erfogreich ausgeloggt"}, status=status.HTTP_200_OK)
