@@ -157,7 +157,6 @@ class CommentDetailView(generics.DestroyAPIView):
         task_id = self.kwargs.get('pk')
         task = get_object_or_404(
             Task, id=task_id)
-        self.check_object_permissions(self.request, task)
         return task
 
     def get_queryset(self):
