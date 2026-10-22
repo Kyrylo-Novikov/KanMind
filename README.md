@@ -35,7 +35,6 @@ kanmind/
 │   ├── auth_app/             # Authentication & user management apps
 │   ├── board_app/            # Task, board, and column management apps
 │   ├── core/                 # Django settings and core configuration
-│   ├── .env.example          # Environment variables template
 │   ├── manage.py             # Django execution script
 │   └── requirements.txt      # Python dependencies
 ├── .gitignore                # Ignored files (database, .env, venv, etc.)
@@ -81,21 +80,7 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 5. Configure Environment Variables (.env)
-
-For security reasons, sensitive data like the Django `SECRET_KEY` is kept out of version control. You need to set this up locally:
-
-1. Copy the provided template:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   _(On Windows Command Prompt, use: `copy .env.example .env`)_
-
-2. Open the newly created `.env` file and define your specific variables (e.g., set a secure `SECRET_KEY`).
-
-### 6. Run Database Migrations
+### 5. Run Database Migrations
 
 _(Note: The SQLite database file is intentionally excluded from the repository via `.gitignore`. Running migrations will generate a fresh local database for you.)_
 
@@ -103,7 +88,7 @@ _(Note: The SQLite database file is intentionally excluded from the repository v
 python manage.py migrate
 ```
 
-### 7. Create a Superuser (Recommended)
+### 6. Create a Superuser (Recommended)
 
 To access the built-in Django Admin panel and manage users/boards easily, create an admin account:
 
@@ -113,7 +98,7 @@ python manage.py createsuperuser
 
 Follow the prompts to set up your admin credentials.
 
-### 8. Start the Development Server
+### 7. Start the Development Server
 
 ```bash
 python manage.py runserver
