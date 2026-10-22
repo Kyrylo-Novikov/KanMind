@@ -132,7 +132,7 @@ class CommentListView(generics.ListCreateAPIView):
 
 
 class CommentDetailView(generics.DestroyAPIView):
-    permission_classes = [IsAuthor]
+    permission_classes = [IsAuthenticated, IsAuthor]
     serializer_class = CommentSerializer
     lookup_url_kwarg = 'comment_pk'
 
@@ -146,7 +146,11 @@ class CommentDetailView(generics.DestroyAPIView):
         self.check_object_permissions(self.request, task)
         return task
     def get_queryset(self):
-        return Comment.objects.filter(task__board__members=self.request.user)
+        """
+        Retrieves all comments associated with the retrieved task.
+        """
+        task = self.get_task()
+        return Comment.objects.filter(task=task)
 
 
 class AssignedToMeView(generics.ListAPIView):
