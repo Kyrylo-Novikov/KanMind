@@ -105,10 +105,14 @@ class TaskUpdateView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "DELETE":
             return [IsAuthenticated(), (IsAuthor | IsOwner)()]
         return [IsAuthenticated(), (IsMember | IsOwner)()]
+
     queryset = Task.objects.all()
 
 
 class CommentListView(generics.ListCreateAPIView):
+    """
+    API view for listing all comments of a specific task and creating new comments.
+    """
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, (IsMember | IsOwner)]
 
@@ -123,15 +127,25 @@ class CommentListView(generics.ListCreateAPIView):
         return task
 
     def get_queryset(self):
+        """
+        Retrieves all comments associated with the retrieved task.
+        """
         task = self.get_task()
         return Comment.objects.filter(task=task)
 
     def perform_create(self, serializer):
+        """
+        Creates a comment instance and automatically assignes the requesting user as the author and links it to the retrieves task.
+        """
         task = self.get_task()
         serializer.save(author=self.request.user, task=task)
 
 
 class CommentDetailView(generics.DestroyAPIView):
+    """
+    API view deleting a specific comment.
+    """
+
     permission_classes = [IsAuthenticated, IsAuthor]
     serializer_class = CommentSerializer
     lookup_url_kwarg = 'comment_pk'
@@ -145,6 +159,7 @@ class CommentDetailView(generics.DestroyAPIView):
             Task, id=task_id)
         self.check_object_permissions(self.request, task)
         return task
+
     def get_queryset(self):
         """
         Retrieves all comments associated with the retrieved task.
