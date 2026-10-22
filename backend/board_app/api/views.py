@@ -91,18 +91,12 @@ class TaskCreateView(generics.ListCreateAPIView):
 
 
 class TaskUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    def get_queryset(self):
-        return Task.objects.filter(board__members=self.request.user)
-
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return TaskReadCreateSerializer
-        return TaskUpdateDeleteSerializer
+    serializer_class = TaskUpdateDeleteSerializer
 
     def get_permissions(self):
         if self.request.method == "DELETE":
             return [IsAuthenticated(), (IsAuthor | IsOwner)()]
-        return [IsAuthenticated(), IsMember()]
+    queryset = Task.objects.all()
 
 
 class CommentListView(generics.ListCreateAPIView):
