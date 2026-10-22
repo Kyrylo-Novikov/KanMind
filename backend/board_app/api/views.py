@@ -138,16 +138,28 @@ class CommentDetailView(generics.DestroyAPIView):
 
 
 class AssignedToMeView(generics.ListAPIView):
+    """
+    API view for listing all task assigned to the requesting user.
+    """
     permission_classes = [IsAuthenticated]
-    serializer_class = TaskReadCreateSerializer
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
+        """
+        Retrieves tasks where the requesting user is the assignee
+        """
         return Task.objects.filter(assignee=self.request.user)
 
 
 class ReviewingView(generics.ListAPIView):
+    """
+    API view for listing all task where the requesting user is assigned as the reviewer.
+    """
     permission_classes = [IsAuthenticated]
-    serializer_class = TaskReadCreateSerializer
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
+        """
+        Retrieves tasks where the requesting user is the reviewer
+        """
         return Task.objects.filter(reviewer=self.request.user)
