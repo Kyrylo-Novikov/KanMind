@@ -23,11 +23,13 @@ def validate_board_member(serializer, user):
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    fullname = serializers.CharField(source='username', read_only=True)
-
+    """
+    Serializer for representing basic user data (id, username, email)
+    """
     class Meta:
         model = User
-        fields = ['id', 'fullname', 'email']
+        fields = ['id', 'username', 'email']
+        read_only_fields = ['id', 'username', 'email']
 
 
 class TaskReadCreateSerializer(serializers.ModelSerializer):
