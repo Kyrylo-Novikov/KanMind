@@ -2,12 +2,12 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from board_app.models import Board, Task, Comment
-from .serializers import BoardSerializer, MemberSerializer, TaskUpdateDeleteSerializer, TaskReadCreateSerializer, CommentSerializer, BoardDetailSerializer
-from .permissions import IsOwner, IsMember, IsAuthor
+from .serializers import BoardSerializer, MemberSerializer, TaskUpdateDeleteSerializer, TaskUpdateDeleteSerializer, TaskSerializer, CommentSerializer, BoardDetailSerializer
+from .permissions import IsOwner, IsMember, IsAuthor, IsMemberOrOwnerOfTheBoard
 
 
 class BoardListView(generics.ListCreateAPIView):
