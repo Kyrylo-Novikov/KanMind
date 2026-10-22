@@ -49,12 +49,15 @@ class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class EmailCheckView(APIView):
-    '''
-    Takes the query param to check if a user with this email is already exists.
-    '''
+    """
+    Takes the email query parameter to check if a user with this email already exists.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Retrieves email from the query params to search in db for the user
+        """
         email = request.query_params.get('email')
 
         if not email:
