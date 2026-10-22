@@ -4,6 +4,10 @@ from django.core.validators import MinLengthValidator
 
 
 class Board(models.Model):
+
+    """
+    Represents a board containing the title, members and owner information.
+    """
     title = models.CharField(max_length=50, validators=[MinLengthValidator(3)])
     members = models.ManyToManyField(User, related_name='board', blank=True)
     owner = models.ForeignKey(
@@ -14,6 +18,13 @@ class Board(models.Model):
 
 
 class Task(models.Model):
+    """
+    Represents a task containing the title, description, assignee, reviewer, due_date, board, author, status, and priority information.
+
+    Assignee and reviewer have on_delete set to SET_NULL because deletion of a user should only clear the field on the task without deleting the task it self.
+
+    Status and priority are choices fields.
+    """
     author = models.ForeignKey(
         User, related_name='task_author', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, validators=[MinLengthValidator(3)])
@@ -47,6 +58,11 @@ class Task(models.Model):
 
 
 class Comment(models.Model):
+    """
+    Represents a Comment containing task, author, content, created_at information
+
+    Ordered by created_at in descending order, starting with the newest comment
+    """
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(
