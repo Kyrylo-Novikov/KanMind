@@ -24,16 +24,19 @@ class BoardListView(generics.ListCreateAPIView):
 
 
 class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, or deleting a specific board.
+    """
     serializer_class = BoardDetailSerializer
-
-    def get_queryset(self):
-        # Get all boards where the user is owner or member
-        user = self.request.user
-        return Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
+    queryset = Board.objects.all()
 
     def get_permissions(self):
+        """
+        Assigns permissions based on the request method.
+        Requires board ownership for DELETE requests. For other methods, member or owner permission is sufficient.
+        """
         if self.request.method == 'DELETE':
-            return [IsOwner(), IsAuthenticated()]
+            return [IsAuthenticated(), IsOwner()]
         return [IsAuthenticated(), (IsMember | IsOwner)()]
 
 
