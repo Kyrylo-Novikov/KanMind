@@ -117,7 +117,10 @@ class CommentListView(generics.ListCreateAPIView):
         Retrieves the task from the URL and verifies that the current user is a member of the board.
         """
         task_id = self.kwargs.get('pk')
-        return get_object_or_404(Task, id=task_id, board__members=self.request.user)
+        task = get_object_or_404(
+            Task, id=task_id)
+        self.check_object_permissions(self.request, task)
+        return task
 
     def get_queryset(self):
         task = self.get_task()
