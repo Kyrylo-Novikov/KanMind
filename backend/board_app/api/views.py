@@ -110,7 +110,7 @@ class TaskUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
 class CommentListView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsMember]
+    permission_classes = [IsAuthenticated, (IsMember | IsOwner)]
 
     def get_task(self):
         """
