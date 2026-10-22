@@ -178,6 +178,9 @@ class BoardDetailSerializer(BoardSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for handling Comment data (id, created_at, content, author)
+    """
     author = serializers.CharField(source='author.username', read_only=True)
 
     class Meta:
