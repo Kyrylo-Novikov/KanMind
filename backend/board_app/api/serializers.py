@@ -99,28 +99,44 @@ class TaskUpdateDeleteSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    """
+    Serializer for handling Board data (id, title, member_count, ticket_count,
+                  tasks_to_do_count, tasks_high_prio_count, owner_id, members)
+    """
     title = serializers.CharField(max_length=50)
     members = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=User.objects.all(),
         required=False, write_only=True
     )
-    member_count = serializers.SerializerMethodField()
+    members_count = serializers.SerializerMethodField()
     ticket_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
     tasks_high_prio_count = serializers.SerializerMethodField()
     owner_id = serializers.ReadOnlyField(source='owner.id')
 
-    def get_member_count(self, obj) -> int:
+    def get_members_count(self, obj) -> int:
+        """
+        Counts the members on the board.
+        """
         return obj.members.count()
 
     def get_ticket_count(self, obj) -> int:
+        """
+        Counts the tasks on the board.
+        """
         return obj.tasks.count()
 
     def get_tasks_to_do_count(self, obj) -> int:
+        """
+        Counts the tasks on status 'to-do' on the board.
+        """
         return obj.tasks.filter(status='to-do').count()
 
     def get_tasks_high_prio_count(self, obj) -> int:
+        """
+        Counts the high priority task on the board.
+        """
         return obj.tasks.filter(priority='high').count()
 
     class Meta:
@@ -130,11 +146,18 @@ class BoardSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailSerializer(BoardSerializer):
+    """
+    Serializer that inherits from BoardSerializer , including only with id, title, owner_id and members fields 
+    """
     class Meta(BoardSerializer.Meta):
         fields = ['id', 'title',
                   'owner_id', 'members']
 
     def to_representation(self, instance):
+        """
+        Display the Members using the MemberSerializer and the tasks using the TaskUpdateDeleteSerializer.
+        If the request method is PATCH, it removes the owner_id from the response and provides full owner and member data
+        """
         rep = super().to_representation(instance)
         request = self.context.get('request')
         if request.method == 'PATCH':
@@ -145,7 +168,7 @@ class BoardDetailSerializer(BoardSerializer):
         else:
             rep['members'] = MemberSerializer(
                 instance.members.all(), many=True).data
-            rep['tasks'] = TaskReadCreateSerializer(
+            rep['tasks'] = TaskUpdateDeleteSerializer(
                 instance.tasks.all(), many=True).data
         return rep
 
