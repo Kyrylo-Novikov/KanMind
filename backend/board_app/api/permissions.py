@@ -4,7 +4,6 @@ from board_app.models import Board
 
 class IsOwner(permissions.BasePermission):
     """
-    Object-level permission:
     Allows access only to the owner of the object.
     """
 
@@ -18,7 +17,6 @@ class IsOwner(permissions.BasePermission):
 
 class IsMember(permissions.BasePermission):
     """
-    Object-level permission:
     Allows access only to the members of the board.
     """
 
@@ -61,7 +59,6 @@ class IsMemberOrOwnerOfTheBoard(permissions.BasePermission):
 
 class IsAuthor(permissions.BasePermission):
     """
-        Object-level permission:
         Allows access only to the author of comment.
     """
 
