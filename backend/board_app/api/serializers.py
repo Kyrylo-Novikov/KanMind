@@ -93,6 +93,14 @@ class TaskSerializer(serializers.ModelSerializer):
             rep['reviewer'] = None
         return rep
 
+class TaskUpdateDeleteSerializer(TaskSerializer):
+    """
+    Serializer that inherits from TaskSerializer, excluding the board field
+    to prevent moving the task to another board.
+    """
+    class Meta(TaskSerializer.Meta):
+        fields = [field for field in TaskSerializer.Meta.fields if field != 'board']
+
 
 class BoardSerializer(serializers.ModelSerializer):
     """
