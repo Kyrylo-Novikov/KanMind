@@ -32,13 +32,21 @@ class MemberSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'username', 'email']
 
 
-class TaskReadCreateSerializer(serializers.ModelSerializer):
-    assignee = MemberSerializer()
-    reviewer = MemberSerializer()
-    priority = serializers.CharField()
+class TaskSerializer(serializers.ModelSerializer):
+    """
+    Serializer for handling Task data (id, board, title, description, status, priority, assignee, reviewer, due_date, comments_count')
+    """
+    assignee = serializers.PrimaryKeyRelatedField(
+        allow_null=True, queryset=User.objects.all(), required=False, write_only=True)
+    reviewer = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), required=False, allow_null=True, write_only=True)
+    due_date = serializers.DateField(required=True)
     comments_count = serializers.SerializerMethodField()
 
     def get_comments_count(self, obj) -> int:
+        """
+        Counts the comments on the task.
+        """
         count = obj.comments.count()
         return count
 
@@ -47,45 +55,33 @@ class TaskReadCreateSerializer(serializers.ModelSerializer):
         fields = ['id', 'board', 'title', 'description', 'status', 'priority',
                   'assignee', 'reviewer', 'due_date', 'comments_count']
 
-        def validate_assignee(self, value):
-            return validate_board_member(self, value)
-
-        def validate_reviewer(self, value):
-            return validate_board_member(self, value)
-
-
-class TaskUpdateDeleteSerializer(serializers.ModelSerializer):
-    priority = serializers.CharField()
-    assignee_id = serializers.PrimaryKeyRelatedField(
-        source="assignee", allow_null=True, queryset=User.objects.all(), required=False, write_only=True)
-    reviewer_id = serializers.PrimaryKeyRelatedField(
-        source="reviewer", queryset=User.objects.all(), required=False, allow_null=True, write_only=True)
-    due_date = serializers.DateField(required=True)
-    comments_count = serializers.SerializerMethodField()
-
-    def get_comments_count(self, obj) -> int:
-        comments = obj.comments.count()
-        return comments
-
-    class Meta:
-        model = Task
-        fields = ['id', 'board', 'title', 'description', 'status',
-                  'priority', 'reviewer_id', 'assignee_id', 'assignee', 'reviewer', 'due_date', 'comments_count']
         read_only_fields = ['id']
 
-    def validate_assignee_id(self, value):
+    def validate_assignee(self, value):
+        """
+        Validate whether the chosen assignee is a member of the board.
+        """
         return validate_board_member(self, value)
 
-    def validate_reviewer_id(self, value):
+    def validate_reviewer(self, value):
+        """
+        Validate whether reviewer is a member of the board.
+        """
         return validate_board_member(self, value)
 
     def validate_due_date(self, value):
-        if value < date.today():
+        """
+        Validate whether the provided due date is in the future.
+        """
+        if value <= date.today():
             raise serializers.ValidationError(
                 "The due date hase to be in the future")
         return value
 
     def to_representation(self, instance):
+        """
+        Represents the assignee and reviewer using the MemberSerializer if they are set,otherwise None. 
+        """
         rep = super().to_representation(instance)
         if instance.assignee:
             rep['assignee'] = MemberSerializer(instance.assignee).data
