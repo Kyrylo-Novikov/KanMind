@@ -32,20 +32,29 @@ class IsMember(permissions.BasePermission):
 
 class IsMemberOrOwnerOfTheBoard(permissions.BasePermission):
     """
-    Object-level / relation permission:
-    Checks if the authenticated user is owner or member of the board 
-    referenced in request.data['board']
+    Permission to controle read and write access to the boards
     """
 
     def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated:
-            return False
+        """
+        Allows safe read methods for the user.
+        For write methods, grants permission if the user is owner or member of the board.
+
+        Args:
+            request (Request): The incoming HTTP Request.
+            view (APIView) : The view being accessed.
+
+        Returns:
+            bool: True if  permissions is granted, False otherwise .
+        """
+        if request.method in permissions.SAFE_METHODS:
+            return True
         board_id = request.data.get('board')
         if not board_id:
-            return False
+            return True
         try:
             board = Board.objects.get(id=board_id)
-        except Board.DoesNotExist:
+        except (Board.DoesNotExist, ValueError, TypeError):
             return False
         return board.owner == request.user or board.members.filter(id=request.user.id).exists()
 
