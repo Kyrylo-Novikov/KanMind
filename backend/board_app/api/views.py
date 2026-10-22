@@ -11,15 +11,23 @@ from .permissions import IsOwner, IsMember, IsAuthor, IsMemberOrOwnerOfTheBoard
 
 
 class BoardListView(generics.ListCreateAPIView):
+    """
+    API view for listing all Boards of a user and creating new board.
+    """
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Get all boards where the user is owner or member
+        """
+        Retrieves all boards where the user is owner or member.
+        """
         user = self.request.user
         return Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
 
     def perform_create(self, serializer):
+        """
+        Saves a new board instance and automatically assigns the requesting user as the owner.
+        """
         board = serializer.save(owner=self.request.user)
 
 
