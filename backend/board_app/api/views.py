@@ -91,11 +91,20 @@ class TaskCreateView(generics.ListCreateAPIView):
 
 
 class TaskUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, or deleting a specific task.
+    """
     serializer_class = TaskUpdateDeleteSerializer
 
     def get_permissions(self):
+        """
+        Assigns permissions based on the request method.
+        Requires board ownership or to be the author of the task for DELETE requests.
+        For other methods, member or owner permission is sufficient.
+        """
         if self.request.method == "DELETE":
             return [IsAuthenticated(), (IsAuthor | IsOwner)()]
+        return [IsAuthenticated(), (IsMember | IsOwner)()]
     queryset = Task.objects.all()
 
 
