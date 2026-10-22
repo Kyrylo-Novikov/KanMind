@@ -73,12 +73,11 @@ class TaskCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Task.objects.filter(board__members=self.request.user)
-
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return TaskReadCreateSerializer
-        return TaskUpdateDeleteSerializer
+        """
+        Retrieves all tasks belonging to boards where the requesting user is either owner or member
+        """
+        user = self.request.user
+        return Task.objects.filter(Q(board__owner=user) | Q(board__members=user)).distinct()
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
