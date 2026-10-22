@@ -70,7 +70,11 @@ class EmailCheckView(APIView):
 
 
 class TaskCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    """
+    API view for listing all tasks of a user and creating new tasks.
+    """
+    permission_classes = [IsAuthenticated, IsMemberOrOwnerOfTheBoard]
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
         """
@@ -80,6 +84,9 @@ class TaskCreateView(generics.ListCreateAPIView):
         return Task.objects.filter(Q(board__owner=user) | Q(board__members=user)).distinct()
 
     def perform_create(self, serializer):
+        """
+        Creating a task instance and automaticlly assigns the requesting user as the author
+        """
         serializer.save(author=self.request.user)
 
 
