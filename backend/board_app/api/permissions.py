@@ -53,7 +53,7 @@ class IsMemberOrOwnerOfTheBoard(permissions.BasePermission):
         try:
             board = Board.objects.get(id=board_id)
         except (Board.DoesNotExist, ValueError, TypeError):
-            return False
+            return True
         return board.owner == request.user or board.members.filter(id=request.user.id).exists()
 
 
