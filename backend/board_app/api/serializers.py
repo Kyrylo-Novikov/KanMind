@@ -30,7 +30,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'fullname', 'email']
+        fields = ['id', 'email', 'fullname']
 
 
 class TaskSerializer(serializers.ModelSerializer):
