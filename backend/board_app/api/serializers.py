@@ -26,20 +26,21 @@ class MemberSerializer(serializers.ModelSerializer):
     """
     Serializer for representing basic user data (id, username, email)
     """
+    fullname = serializers.CharField(source='username', read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
-        read_only_fields = ['id', 'username', 'email']
+        fields = ['id', 'fullname', 'email']
 
 
 class TaskSerializer(serializers.ModelSerializer):
     """
     Serializer for handling Task data (id, board, title, description, status, priority, assignee, reviewer, due_date, comments_count')
     """
-    assignee = serializers.PrimaryKeyRelatedField(
-        allow_null=True, queryset=User.objects.all(), required=False, write_only=True)
-    reviewer = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), required=False, allow_null=True, write_only=True)
+    assignee_id = serializers.PrimaryKeyRelatedField(source="assignee",
+                                                     allow_null=True, queryset=User.objects.all(), required=False, write_only=True)
+    reviewer_id = serializers.PrimaryKeyRelatedField(source="reviewer",
+                                                     queryset=User.objects.all(), required=False, allow_null=True, write_only=True)
     due_date = serializers.DateField(required=True)
     comments_count = serializers.SerializerMethodField()
 
@@ -53,9 +54,9 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'board', 'title', 'description', 'status', 'priority',
-                  'assignee', 'reviewer', 'due_date', 'comments_count']
+                  'assignee_id', 'reviewer_id', 'assignee', 'reviewer', 'due_date', 'comments_count']
 
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'assignee', 'reviewer']
 
     def validate_assignee(self, value):
         """
@@ -75,7 +76,7 @@ class TaskSerializer(serializers.ModelSerializer):
         """
         if value <= date.today():
             raise serializers.ValidationError(
-                "The due date hase to be in the future")
+                "Please enter a due date in the future.")
         return value
 
     def to_representation(self, instance):
@@ -114,13 +115,13 @@ class BoardSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         required=False, write_only=True
     )
-    members_count = serializers.SerializerMethodField()
+    member_count = serializers.SerializerMethodField()
     ticket_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
     tasks_high_prio_count = serializers.SerializerMethodField()
     owner_id = serializers.ReadOnlyField(source='owner.id')
 
-    def get_members_count(self, obj) -> int:
+    def get_member_count(self, obj) -> int:
         """
         Counts the members on the board.
         """
@@ -146,7 +147,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'members_count', 'ticket_count',
+        fields = ['id', 'title', 'member_count', 'ticket_count',
                   'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id', 'members']
 
 
