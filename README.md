@@ -31,13 +31,12 @@ The corresponding **Frontend Repository** can be found here: [Link to Frontend R
 
 ```text
 kanmind/
-├── backend/                  # Main backend application directory
-│   ├── auth_app/             # Authentication & user management apps
-│   ├── board_app/            # Task, board, and column management apps
-│   ├── core/                 # Django settings and core configuration
-│   ├── manage.py             # Django execution script
-│   └── requirements.txt      # Python dependencies
-├── .gitignore                # Ignored files (database, .env, venv, etc.)
+├── auth_app/                 # Authentication & user management apps
+├── board_app/                # Task, board, and column management apps
+├── core/                     # Django settings and core configuration
+├── manage.py                 # Django execution script
+├── requirements.txt          # Python dependencies
+├── .gitignore                # Ignored files (database, venv, etc.)
 ├── LICENSE.md                # License and legal terms
 └── README.md                 # Project documentation
 ```
@@ -53,13 +52,7 @@ git clone https://github.com/Kyrylo-Novikov/kanmind.git
 cd kanmind
 ```
 
-### 2. Navigate to the Backend Directory
-
-```bash
-cd backend
-```
-
-### 3. Create and Activate a Virtual Environment
+### 2. Create and Activate a Virtual Environment
 
 ```bash
 python -m venv venv
@@ -74,13 +67,13 @@ python -m venv venv
   source venv/bin/activate
   ```
 
-### 4. Install Dependencies
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Run Database Migrations
+### 4. Run Database Migrations
 
 _(Note: The SQLite database file is intentionally excluded from the repository via `.gitignore`. Running migrations will generate a fresh local database for you.)_
 
@@ -88,7 +81,7 @@ _(Note: The SQLite database file is intentionally excluded from the repository v
 python manage.py migrate
 ```
 
-### 6. Create a Superuser (Recommended)
+### 5. Create a Superuser (Recommended)
 
 To access the built-in Django Admin panel and manage users/boards easily, create an admin account:
 
@@ -98,7 +91,7 @@ python manage.py createsuperuser
 
 Follow the prompts to set up your admin credentials.
 
-### 7. Start the Development Server
+### 6. Start the Development Server
 
 ```bash
 python manage.py runserver
