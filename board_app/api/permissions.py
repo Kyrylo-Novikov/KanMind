@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from board_app.models import Board
+from rest_framework.exceptions import NotFound
 
 
 class IsOwner(permissions.BasePermission):
@@ -53,7 +54,7 @@ class IsMemberOrOwnerOfTheBoard(permissions.BasePermission):
         try:
             board = Board.objects.get(id=board_id)
         except (Board.DoesNotExist, ValueError, TypeError):
-            return True
+                raise NotFound("Board not found")
         return board.owner == request.user or board.members.filter(id=request.user.id).exists()
 
 
