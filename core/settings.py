@@ -33,7 +33,9 @@ DEBUG = True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'kanmind-9hys.onrender.com'
+]
 
 
 # Application definition
