@@ -30,9 +30,7 @@ SECRET_KEY=os.getenv('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'kanmind-9hys.onrender.com'
-]
+ALLOWED_HOSTS = ['kanmind-9hys.onrender.com','127.0.0.1', 'localhost']
 
 
 # Application definition
